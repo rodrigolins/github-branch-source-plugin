@@ -26,12 +26,11 @@ package org.jenkinsci.plugins.github_branch_source;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.logging.Logger;
 import jenkins.scm.api.SCMHead;
 import jenkins.scm.api.mixin.ChangeRequestSCMHead;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.github.GHPullRequest;
+
+import java.util.logging.Logger;
 
 /**
  * Head corresponding to a pull request.
@@ -49,6 +48,7 @@ public final class PullRequestSCMHead extends SCMHead implements ChangeRequestSC
     private final String sourceOwner;
     private final String sourceRepo;
     private final String sourceBranch;
+    private final String targetOwner;
     /**
      * Only populated if de-serializing instances.
      */
@@ -60,6 +60,7 @@ public final class PullRequestSCMHead extends SCMHead implements ChangeRequestSC
         this.merge = merge;
         this.number = pr.getNumber();
         this.target = new BranchSCMHead(pr.getBase().getRef());
+        this.targetOwner = pr.getBase().getRepository().getOwnerName();
         // the source stuff is immutable for a pull request on github, so safe to store here
         this.sourceOwner = pr.getHead().getRepository().getOwnerName();
         this.sourceRepo = pr.getHead().getRepository().getName();
@@ -67,11 +68,12 @@ public final class PullRequestSCMHead extends SCMHead implements ChangeRequestSC
     }
 
     PullRequestSCMHead(@NonNull String name, boolean merge, int number,
-                       BranchSCMHead target, String sourceOwner, String sourceRepo, String sourceBranch) {
+                       BranchSCMHead target, String sourceOwner, String targetOwner, String sourceRepo, String sourceBranch) {
         super(name);
         this.merge = merge;
         this.number = number;
         this.target = target;
+        this.targetOwner = targetOwner;
         this.sourceOwner = sourceOwner;
         this.sourceRepo = sourceRepo;
         this.sourceBranch = sourceBranch;
@@ -108,6 +110,7 @@ public final class PullRequestSCMHead extends SCMHead implements ChangeRequestSC
                     merge,
                     metadata.getNumber(),
                     new BranchSCMHead(metadata.getBaseRef()),
+                    metadata.getUserLogin(),
                     null,
                     null,
                     null
@@ -141,6 +144,10 @@ public final class PullRequestSCMHead extends SCMHead implements ChangeRequestSC
     @Override
     public SCMHead getTarget() {
         return target;
+    }
+
+    public String getTargetOwner() {
+        return targetOwner;
     }
 
     public String getSourceOwner() {

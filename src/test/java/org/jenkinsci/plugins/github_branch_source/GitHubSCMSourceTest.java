@@ -215,7 +215,7 @@ public class GitHubSCMSourceTest {
     }
 
     private PullRequestSCMRevision createRevision(String sourceOwner) {
-        PullRequestSCMHead head = new PullRequestSCMHead("", false, 0, null, sourceOwner, null, null);
+        PullRequestSCMHead head = new PullRequestSCMHead("", false, 0, null, sourceOwner, sourceOwner, null, null);
         return new PullRequestSCMRevision(head, null, null);
     }
 
